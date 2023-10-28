@@ -14,6 +14,7 @@ void factorize(const char *str_n)
 
 	mpz_inits(n, i, j, NULL);
 	mpz_set_str(n, str_n, 10);
+
 	mpz_set_ui(i, 2);
 	mpz_set_ui(j, 4);
 	while (mpz_cmp(j, n) <= 0)
@@ -26,12 +27,52 @@ void factorize(const char *str_n)
 			mpz_clears(n, i, quotient, remainder, NULL);
 			return;
 		}
-		mpz_add_ui(i, i, 1);
+
+		mpz_nextprime(i, i);
 		mpz_mul(j, i, i);
 		mpz_clear(quotient);
 		mpz_clear(remainder);
 	}
-	mpz_clears(n, i, NULL);
+	mpz_clears(n, i, j, NULL);
+}
+/**
+ * pollards_rho - Pollard's Rho Algorithm for factorization
+ * @str_n: The integer to factorize
+ */
+void pollards_rho(const char *str_n)
+{
+	mpz_t x, y, d, n, f, factor;
+
+	mpz_inits(x, y, d, n, f, factor, NULL);
+	mpz_set_ui(x, 2);
+	mpz_set_ui(y, 2);
+	mpz_set_ui(d, 1);
+	mpz_set_str(n, str_n, 10);
+
+	while (mpz_cmp_ui(d, 1) == 0)
+	{
+		mpz_mul(x, x, x);
+		mpz_add_ui(x, x, 1);
+		mpz_mod(x, x, n);
+
+		mpz_mul(y, y, y);
+		mpz_add_ui(y, y, 1);
+		mpz_mod(y, y, n);
+		mpz_mul(y, y, y);
+		mpz_add_ui(y, y, 1);
+		mpz_mod(y, y, n);
+
+		mpz_sub(factor, x, y);
+		mpz_abs(factor, factor);
+		mpz_gcd(d, factor, n);
+	}
+
+	if (mpz_cmp(d, n) != 0)
+	{
+		mpz_divexact(f, n, d);
+		gmp_printf("%Zd=%Zd*%Zd\n", n, f, d);
+	}
+	mpz_clears(x, y, d, n, f, factor, NULL);
 }
 /**
  * main - Entry point
@@ -54,7 +95,7 @@ int main(int argc, char *argv[])
 		return (1);
 	while (fgets(line, sizeof(line), file) != NULL)
 	{
-		factorize(line);
+		pollards_rho(line);
 	}
 	fclose(file);
 	return (0);
