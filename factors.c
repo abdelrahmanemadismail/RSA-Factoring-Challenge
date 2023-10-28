@@ -5,15 +5,15 @@
  * factorize - Factorize an integer into two smaller integers
  * @n: The integer to factorize
  */
-void factorize(long long n)
+void factorize(unsigned long long n)
 {
-	long long i;
+	unsigned long long i;
 
 	for (i = 2; i * i <= n; i++)
 	{
 		if (n % i == 0)
 		{
-			printf("%lld=%lld*%lld\n", n, n / i, i);
+			printf("%llu=%llu*%llu\n", n, n / i, i);
 			return;
 		}
 	}
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 {
 	char *filename, line[256];
 	FILE *file;
-	long long n;
+	unsigned long long n;
 
 	if (argc != 2)
 		return (1);
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 		return (1);
 	while (fgets(line, sizeof(line), file) != NULL)
 	{
-		n = atoll(line);
+		n = strtoull(line, NULL, 10);
 		factorize(n);
 	}
 	fclose(file);
