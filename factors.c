@@ -1,22 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <gmp.h>
+
 /**
  * factorize - Factorize an integer into two smaller integers
- * @n: The integer to factorize
+ * @str_n: The integer to factorize
  */
-void factorize(unsigned long long n)
+void factorize(const char *str_n)
 {
-	unsigned long long i;
+	mpz_t n, i, j;
+	mpz_t quotient, remainder;
 
-	for (i = 2; i * i <= n; i++)
+	mpz_inits(n, i, j, NULL);
+	mpz_set_str(n, str_n, 10);
+	mpz_set_ui(i, 2);
+	mpz_set_ui(j, 4);
+	while (mpz_cmp(j, n) <= 0)
 	{
-		if (n % i == 0)
+		mpz_inits(quotient, remainder, NULL);
+		mpz_fdiv_qr(quotient, remainder, n, i);
+		if (mpz_cmp_ui(remainder, 0) == 0)
 		{
-			printf("%llu=%llu*%llu\n", n, n / i, i);
+			gmp_printf("%Zd=%Zd*%Zd\n", n, quotient, i);
+			mpz_clears(n, i, quotient, remainder, NULL);
 			return;
 		}
+		mpz_add_ui(i, i, 1);
+		mpz_mul(j, i, i);
+		mpz_clear(quotient);
+		mpz_clear(remainder);
 	}
+	mpz_clears(n, i, NULL);
 }
 /**
  * main - Entry point
@@ -28,7 +43,6 @@ int main(int argc, char *argv[])
 {
 	char *filename, line[256];
 	FILE *file;
-	unsigned long long n;
 
 	if (argc != 2)
 		return (1);
@@ -40,8 +54,7 @@ int main(int argc, char *argv[])
 		return (1);
 	while (fgets(line, sizeof(line), file) != NULL)
 	{
-		n = strtoull(line, NULL, 10);
-		factorize(n);
+		factorize(line);
 	}
 	fclose(file);
 	return (0);
