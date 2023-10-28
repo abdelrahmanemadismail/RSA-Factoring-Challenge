@@ -72,6 +72,11 @@ void pollards_rho(const char *str_n)
 		mpz_divexact(f, n, d);
 		gmp_printf("%Zd=%Zd*%Zd\n", n, f, d);
 	}
+	else
+	{
+		mpz_set_ui(f, 1);
+		gmp_printf("%Zd=%Zd*%Zd\n", n, n, f);
+	}
 	mpz_clears(x, y, d, n, f, factor, NULL);
 }
 /**
