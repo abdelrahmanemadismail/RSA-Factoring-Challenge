@@ -24,7 +24,7 @@ void factorize(const char *str_n)
 		if (mpz_cmp_ui(remainder, 0) == 0)
 		{
 			gmp_printf("%Zd=%Zd*%Zd\n", n, quotient, i);
-			mpz_clears(n, i, quotient, remainder, NULL);
+			mpz_clears(n, i, j, quotient, remainder, NULL);
 			return;
 		}
 
@@ -33,6 +33,8 @@ void factorize(const char *str_n)
 		mpz_clear(quotient);
 		mpz_clear(remainder);
 	}
+	mpz_set_ui(i, 1);
+	gmp_printf("%Zd=%Zd*%Zd\n", n, n, i);
 	mpz_clears(n, i, j, NULL);
 }
 /**
@@ -87,7 +89,9 @@ void pollards_rho(const char *str_n)
  */
 int main(int argc, char *argv[])
 {
-	char *filename, line[256];
+	char *filename, *line = NULL;
+	size_t len = 0;
+	ssize_t read;
 	FILE *file;
 
 	if (argc != 2)
@@ -98,10 +102,14 @@ int main(int argc, char *argv[])
 
 	if (file == NULL)
 		return (1);
-	while (fgets(line, sizeof(line), file) != NULL)
+
+	while ((read = getline(&line, &len, file)) != -1)
 	{
 		pollards_rho(line);
 	}
+
 	fclose(file);
+	if (line)
+		free(line);
 	return (0);
 }
